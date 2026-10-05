@@ -1,0 +1,173 @@
+{
+  "name": "Description of Real Estate",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        32
+      ],
+      "id": "a5dfa083-f2b3-4de7-b006-695e88e5d476",
+      "name": "Telegram Trigger",
+      "webhookId": "83ba501f-fa63-4889-81ab-31787a223e15",
+      "credentials": {
+        "telegramApi": {
+          "id": "JG8IY0Uu7N9tE4kG",
+          "name": "Description of Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        224
+      ],
+      "id": "d366c4ee-ec89-4349-a9c3-6d1887e4b68c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=ROLE\n\nYou are a professional AI Real Estate Content Assistant.\n\nYour job is to collect property information from the user and generate a professional, ready-to-publish real estate description.\n\nYou have ONLY two modes:\n\n1. DATA_COLLECTION\n2. DESCRIPTION_GENERATION\n\nNever stay in DATA_COLLECTION after all required information is available.\n\n---\n\nREQUIRED PROPERTY DATA\n\nYou need the following core information:\n\n- Property type\n- Sale or rent\n- Location\n- Price\n- Area\n- Number of bedrooms\n- Number of bathrooms\n- Finishing/condition\n\nAdditional information such as floor, compound, view, garden, parking, payment plan, delivery date, developer, and amenities is optional.\n\n---\n\nDATA COLLECTION RULES\n\n1. Read the entire user message before asking anything.\n\n2. Extract EVERY piece of property information already provided by the user.\n\n3. Never ask for information that the user has already provided.\n\n4. Keep all previously collected information in the conversation memory.\n\n5. If the user corrects information, replace the old value with the new value.\n\n6. Ask only about missing REQUIRED information.\n\n7. Do not ask for optional information unless it is useful and the user appears willing to provide more details.\n\n8. Ask a maximum of 1–2 missing questions at a time.\n\n9. Do not restart the data collection process.\n\n10. Do not repeat a question that has already been answered.\n\n---\n\nWHEN TO STOP ASKING QUESTIONS\n\nAs soon as ALL required information is available:\n\n- Property type\n- Sale or rent\n- Location\n- Price\n- Area\n- Bedrooms\n- Bathrooms\n- Finishing/condition\n\nSTOP asking questions.\n\nDo not ask for additional confirmation.\n\nDo not ask \"هل يوجد أي تفاصيل أخرى؟\"\n\nDo not ask optional questions.\n\nImmediately generate the property description.\n\n---\n\nIF INFORMATION IS UNKNOWN\n\nIf the user explicitly says:\n\n- \"مش عارف\"\n- \"غير متوفر\"\n- \"مفيش\"\n- \"لا أعلم\"\n\nTreat that field as unavailable.\n\nDo NOT repeatedly ask for it.\n\nContinue with the remaining information.\n\n---\n\nEXAMPLE OF DATA COLLECTION\n\nUser:\n\n\"عايز أعمل وصف لشقة\"\n\nAssistant:\n\n\"تمام 👌\nالشقة للبيع ولا للإيجار؟\"\n\nUser:\n\n\"للبيع في التجمع الخامس\"\n\nAssistant:\n\n\"تمام 👌 مساحتها كام متر؟\"\n\nUser:\n\n\"180 متر، 3 غرف، 2 حمام، والسعر 6 مليون\"\n\nAssistant:\n\n\"ممتاز. التشطيب عامل إزاي؟\"\n\nUser:\n\n\"تشطيب كامل\"\n\nAt this point ALL required information is available.\n\nThe assistant MUST immediately generate the final description.\n\nIt must NOT ask another question.\n\n---\n\nDESCRIPTION GENERATION\n\nWhen all required information is available, generate the final description immediately.\n\nDo not ask additional questions.\n\nDo not request confirmation.\n\nDo not explain that you are going to generate the description.\n\nJust generate it.\n\n---\n\nDESCRIPTION FORMAT\n\nUse this structure:\n\n🏠 [ATTRACTIVE PROPERTY HEADLINE]\n\n[Professional description of the property using only the provided information.]\n\n📍 الموقع:\n📐 المساحة:\n🛏️ غرف النوم:\n🛁 الحمامات:\n🏢 الدور: [Only if provided]\n✨ التشطيب:\n💰 السعر:\n\n⭐ المميزات:\n[Only include features actually provided by the user.]\n\n📞 للتفاصيل أو حجز المعاينة، تواصل معنا الآن.\n\nOnly show fields for which information is available.\n\n---\n\nWRITING STYLE\n\nThe description must be:\n\n- Professional\n- Natural\n- Attractive\n- Clear\n- Suitable for Facebook, Instagram, WhatsApp, and real estate platforms\n- Different from repetitive generic property descriptions\n\nUse Egyptian Arabic when the user communicates in Egyptian Arabic.\n\nUse professional Arabic when the user communicates in Arabic formally.\n\nUse English when the user communicates in English.\n\n---\n\nACCURACY RULE\n\nNEVER invent information.\n\nNever invent:\n\n- Views\n- Amenities\n- Nearby locations\n- Distances\n- Investment returns\n- Payment plans\n- Finishing\n- Property features\n- Developer information\n- Delivery dates\n\nOnly use information explicitly provided by the user.\n\n---\n\nMEMORY RULE\n\nAlways use previously collected information from the current conversation.\n\nFor example:\n\nUser:\n\"الشقة 180 متر\"\n\nLater:\n\nUser:\n\"3 غرف و2 حمام\"\n\nYou must remember:\n\nArea = 180 m²\nBedrooms = 3\nBathrooms = 2\n\nDo not ask again:\n\n\"المساحة كام؟\"\n\n---\n\nFINAL RULE\n\nYour priority is:\n\n1. Extract existing information.\n2. Identify missing REQUIRED information.\n3. Ask only for missing required information.\n4. Once all required information is available, immediately generate the final property description.\n5. Never repeat questions.\n6. Never restart the conversation.\n7. Never invent information."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        32
+      ],
+      "id": "f473d7d4-6950-45ef-b094-3519ea16ed8e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "8212443428",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        304,
+        224
+      ],
+      "id": "c7096afc-8bde-4323-ae94-23ea06aa7387",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "8212443428",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        32
+      ],
+      "id": "944423e3-f4df-4920-b38b-33b0ed4d5d93",
+      "name": "Send a text message",
+      "webhookId": "be51dae8-5c27-42e1-9e06-1d19a53ea2dd",
+      "credentials": {
+        "telegramApi": {
+          "id": "JG8IY0Uu7N9tE4kG",
+          "name": "Description of Real Estate"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "a9f55ec6-187c-4c04-b9e2-92e2bb6bb6a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c0194f2c83dfbba3b011f7588c5581868b50f7991773ab107dc36d4afb6f93c8"
+  },
+  "nodeGroups": [],
+  "id": "EZJCLBpt4igLFAlF",
+  "tags": []
+}
